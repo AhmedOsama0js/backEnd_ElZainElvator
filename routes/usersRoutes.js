@@ -10,7 +10,7 @@ const {
 } = require("../utils/validators/userValidator");
 
 // User Routes
-router.post("/", addUserValidator, addRecord);
+router.post("/", AuthUser, allowedTO("moderator"), addUserValidator, addRecord);
 router.put(
   "/:id",
   AuthUser,
