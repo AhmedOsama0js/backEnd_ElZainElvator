@@ -5,9 +5,18 @@ const morgan = require("morgan");
 
 const errorHandler = require("./middleware/errorMiddleware");
 const ApiError = require("./utils/ApiError");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 connectDB();
 
