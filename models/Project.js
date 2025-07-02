@@ -44,10 +44,10 @@ const elevatorSchema = new mongoose.Schema(
 
 const projectSchema = new mongoose.Schema(
   {
-    // الحالة (عرض - عقد - تنفيذ - أرشيف - متوقف)
+    // مراحل العقد (عرض - عقد - تنفيذ - أرشيف )
     status: {
       type: String,
-      enum: ["offer", "contract", "execution", "archived", "stopped"],
+      enum: ["offer", "contract", "execution", "archived"],
       default: "offer",
     },
 
@@ -122,6 +122,21 @@ const projectSchema = new mongoose.Schema(
       note3: String,
       note4: String,
       note5: String,
+    },
+
+    // حالات  العقد
+    executionStatus: {
+      state: {
+        type: String,
+        enum: ["not_started", "in_progress", "completed", "stopped"],
+        default: "not_started",
+      },
+      stopReason: {
+        type: String,
+        required: function () {
+          return this.executionStatus?.state === "stopped";
+        },
+      },
     },
 
     // مراحل التنفيذ
