@@ -21,19 +21,19 @@ const storeSchema = new mongoose.Schema(
       default: "piece",
     },
 
-    // category: {
-    //   type: String,
-    //   required: true,
-    //   enum: [
-    //     "أسلاك",
-    //     "مفاتيح",
-    //     "لمبات",
-    //     "خراطيم",
-    //     "لوحات",
-    //     "إكسسوارات",
-    //     "أخرى",
-    //   ],
-    // },
+    category: {
+      type: String,
+      required: true,
+      enum: [
+        "أسلاك",
+        "مفاتيح",
+        "لمبات",
+        "خراطيم",
+        "لوحات",
+        "إكسسوارات",
+        "أخرى",
+      ],
+    },
 
     price: {
       type: Number,

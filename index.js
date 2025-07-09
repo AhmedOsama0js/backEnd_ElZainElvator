@@ -32,14 +32,16 @@ connectDB();
 
 const usersRoute = require("./routes/usersRoutes");
 const authRoute = require("./routes/authRouters");
-const productRoutes = require("./routes/projectRoutes");
+const projectRoutes = require("./routes/projects");
+const storeRoutes = require("./routes/storeRoutes");
 
 if (process.env.NODE_MODE === "dev") {
   app.use(morgan("dev"));
 }
 app.use("/api/user", usersRoute);
 app.use("/api/auth", authRoute);
-app.use("/api/product", productRoutes);
+app.use("/api/project", projectRoutes);
+app.use("/api/store", storeRoutes);
 
 app.use((req, res, next) => {
   next(new ApiError(`Cannot find ${req.originalUrl} on this server ⚠️`, 404));

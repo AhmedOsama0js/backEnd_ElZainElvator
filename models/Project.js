@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 mongoose.models.Project && delete mongoose.models.Project;
+const assignContractNumber = require("../hooks/assignContractNumber");
+const setExecutionDates = require("../hooks/setExecutionDates");
 
 // ---------------------------
 //   الجزء الخاص بمراحل التنفيز
@@ -72,6 +74,7 @@ const projectSchema = new mongoose.Schema(
     // بيانات العقد
     contract: {
       number: { type: String, required: false, unique: true },
+      seq: { type: Number },
       date: {
         type: Date,
         default: Date.now,
@@ -146,37 +149,9 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-projectSchema.pre("save", async function (next) {
-  if (this.contract.number) return next();
+projectSchema.pre("save", assignContractNumber);
 
-  const year = new Date().getFullYear();
-
-  const count = await mongoose.model("Project").countDocuments({
-    "contract.date": {
-      $gte: new Date(`${year}-01-01`),
-      $lte: new Date(`${year}-12-31`),
-    },
-  });
-
-  const serial = String(count + 1).padStart(3, "0");
-  this.contract.number = `C-${year}-${serial}`;
-
-  next();
-});
-
-executionStageSchema.pre("save", function (next) {
-  if (!this.startDate) {
-    this.startDate = new Date();
-  }
-
-  if (!this.endDate) {
-    const end = new Date(this.startDate);
-    end.setDate(end.getDate() + 15);
-    this.endDate = end;
-  }
-
-  next();
-});
+executionStageSchema.pre("save", setExecutionDates);
 
 const Project = mongoose.model("Project", projectSchema);
 
