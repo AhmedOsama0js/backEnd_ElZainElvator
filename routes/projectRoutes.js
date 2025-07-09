@@ -18,7 +18,7 @@ const {
   completeContractAndArchive,
   toggleContractExecution,
   archiveStoppedContract,
-} = require("../controllers/productController");
+} = require("../controllers/projectController");
 
 const {
   offerValidator,

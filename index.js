@@ -7,13 +7,23 @@ const errorHandler = require("./middleware/errorMiddleware");
 const ApiError = require("./utils/ApiError");
 const cors = require("cors");
 
+const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+
 const app = express();
 app.use(express.json());
 
+require("./middleware/security")(app);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -22,7 +32,7 @@ connectDB();
 
 const usersRoute = require("./routes/usersRoutes");
 const authRoute = require("./routes/authRouters");
-const productRoutes = require("./routes/productRoutes");
+const productRoutes = require("./routes/projectRoutes");
 
 if (process.env.NODE_MODE === "dev") {
   app.use(morgan("dev"));

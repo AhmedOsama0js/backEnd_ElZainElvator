@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
-mongoose.models.Product && delete mongoose.models.Product;
+mongoose.models.Store && delete mongoose.models.Store;
 
-const productSchema = new mongoose.Schema(
+const storeSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -55,5 +55,5 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const Product = mongoose.model("Product", productSchema);
-module.exports = Product;
+const Store = mongoose.model("Store", storeSchema);
+module.exports = Store;

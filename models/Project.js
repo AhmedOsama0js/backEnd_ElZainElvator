@@ -66,7 +66,6 @@ const projectSchema = new mongoose.Schema(
       },
       name: { type: String, required: true },
       phone: { type: String, required: true },
-      branch: String,
       address: { type: String, required: true },
     },
 
