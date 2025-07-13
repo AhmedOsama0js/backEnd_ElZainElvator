@@ -15,6 +15,7 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
     paymentPercentages,
     executionStages,
     executionStatus,
+    durationInDays,
   } = req.body;
 
   if (contract || executionStages || paymentPercentages || executionStatus) {
@@ -26,21 +27,6 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // ✅ تحقق من الحقول الأساسية المطلوبة
-  if (
-    !client ||
-    !client.name ||
-    !client.phone ||
-    !client.category ||
-    !client.address
-  ) {
-    return next(new ApiError("⚠️ بيانات العميل غير مكتملة", 400));
-  }
-
-  if (!elevator || typeof elevator.numberOfElevators !== "number") {
-    return next(new ApiError("⚠️ عدد المصاعد مطلوب", 400));
-  }
-
   const newProject = await Project.create({
     status: "offer",
     client,
@@ -50,6 +36,7 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
     representative,
     transferLocation,
     notes,
+    durationInDays,
   });
 
   res.status(201).json({

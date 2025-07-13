@@ -2,33 +2,59 @@ const mongoose = require("mongoose");
 mongoose.models.Project && delete mongoose.models.Project;
 const assignContractNumber = require("../hooks/assignContractNumber");
 const setExecutionDates = require("../hooks/setExecutionDates");
+const finalPrice = require("../hooks/finalPrice");
 
 // ---------------------------
 //   الجزء الخاص بمراحل التنفيز
 // ---------------------------
 
-const executionStageSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  description: String,
-  startDate: Date,
-  endDate: Date,
-  completed: { type: Boolean, default: false },
-  notes: String,
-});
+const executionStageSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ["pending", "in_progress", "completed"],
+      default: "pending",
+    },
+    startDate: Date,
+    endDate: Date,
+    completed: { type: Boolean, default: false },
+    notes: String,
+    productsUsed: [
+      {
+        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        quantity: Number,
+      },
+    ],
+  },
+  { _id: false }
+);
+
 // ---------------------------
 //   الجزء الخاص بالمصعد التنفيز
 // ---------------------------
 
 const elevatorSchema = new mongoose.Schema(
   {
-    category: String,
-    type: String,
+    category: {
+      type: String,
+      enum: ["automatic", "semi-automatic", "home-lift"],
+      required: true,
+    },
     numberOfElevators: { type: Number, required: true },
     stops: Number,
     floors: Number,
     entrances: Number,
-    loadCapacity: String,
-    machineType: String,
+    loadCapacity: {
+      type: Number,
+      enum: [450, 630, 800],
+      required: true,
+    },
+    machineType: {
+      type: String,
+      enum: ["chinese", "italian"],
+      required: true,
+    },
     features: {
       electronicCard: Boolean,
       battery: Boolean,
@@ -81,6 +107,13 @@ const projectSchema = new mongoose.Schema(
       },
     },
 
+    // مدة المشروع بالأيام
+    durationInDays: {
+      type: Number,
+      enum: [30, 45, 60],
+      required: true,
+    },
+
     // بيانات المصعد الأساسية
     elevator: elevatorSchema,
 
@@ -89,19 +122,31 @@ const projectSchema = new mongoose.Schema(
       first: Number,
       second: Number,
       third: Number,
-      fourth: Number,
     },
 
     // مواصفات المصعد
     specifications: {
-      doorType: String,
-      doorSize: String,
-      innerDoor: String,
-      shaftWidth: String,
-      shaftLength: String,
-      cabinSize: String,
-      shaftPit: String,
-      lastFloorHeight: String,
+      doorType: {
+        type: String,
+        enum: ["semi-automatic", "center", "telescope"],
+        required: true,
+      },
+      doorSize: {
+        type: Number,
+        enum: [70, 80],
+        required: true,
+      },
+      innerDoor: {
+        type: String,
+        enum: ["automatic", "semi-automatic"],
+        required: true,
+      },
+      shaftWidth: Number,
+      shaftLength: Number,
+      cabinSize: Number,
+      shaftPit: Number,
+      lastFloorHeight: Number,
+      totalShaftHeight: Number, //الارتفاع الكلي = عمق البير + ارتفاع آخر دور + (عدد الأدوار - 1) × ارتفاع الدور العادي
     },
 
     // السعر
@@ -110,7 +155,7 @@ const projectSchema = new mongoose.Schema(
       systemPrice: Number,
       discount: Number, // اختياري
       tax: Number, // اختياري
-      finalPrice: Number, // ممكن تحسبه تلقائيًا لاحقًا
+      finalPrice: Number,
     },
 
     // بيانات إضافية
@@ -142,7 +187,11 @@ const projectSchema = new mongoose.Schema(
     },
 
     // مراحل التنفيذ
-    executionStages: [executionStageSchema],
+    executionStages: {
+      stage1: executionStageSchema,
+      stage2: executionStageSchema,
+      stage3: executionStageSchema,
+    },
   },
   {
     timestamps: true,
@@ -151,7 +200,9 @@ const projectSchema = new mongoose.Schema(
 
 projectSchema.pre("save", assignContractNumber);
 
-executionStageSchema.pre("save", setExecutionDates);
+projectSchema.pre("save", setExecutionDates);
+
+projectSchema.pre("save", finalPrice);
 
 const Project = mongoose.model("Project", projectSchema);
 

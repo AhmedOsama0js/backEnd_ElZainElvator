@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  updateContract,
+  updateContractPayments,
   convertContractToExecution,
 } = require("../../controllers/projects");
 
@@ -19,7 +19,7 @@ router.patch(
   mongoIdValidator,
   paymentPercentagesValidator,
   checkProjectStatus(["contract"]),
-  updateContract
+  updateContractPayments
 );
 
 router.patch(

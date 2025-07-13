@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../../utils/ApiError");
 
-exports.updateContract = asyncHandler(async (req, res, next) => {
+exports.updateContractPayments = asyncHandler(async (req, res, next) => {
   const project = req.project;
 
   if (!project) {
@@ -19,8 +19,56 @@ exports.updateContract = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (!paymentPercentages) {
-    return next(new ApiError("⚠️ يرجى إرسال بيانات الدفعات للتعديل", 400));
+  if (
+    !paymentPercentages ||
+    typeof paymentPercentages !== "object" ||
+    Array.isArray(paymentPercentages)
+  ) {
+    return next(
+      new ApiError(
+        "⚠️ يرجى إرسال بيانات الدفعات بشكل صحيح (كائن يحتوي على first, second, third)",
+        400
+      )
+    );
+  }
+
+  const allowedKeys = ["first", "second", "third"];
+  const keys = Object.keys(paymentPercentages);
+
+  const hasAllKeys = allowedKeys.every((key) => keys.includes(key));
+  if (!hasAllKeys || keys.length !== 3) {
+    return next(
+      new ApiError(
+        "⚠️ يجب أن تحتوي الدفعات على المفاتيح التالية فقط: first, second, third",
+        400
+      )
+    );
+  }
+
+  for (const key of allowedKeys) {
+    const value = paymentPercentages[key];
+    if (typeof value !== "number" || value < 0 || value > 100) {
+      return next(
+        new ApiError(
+          `⚠️ قيمة الدفعة '${key}' يجب أن تكون رقمًا بين 0 و 100`,
+          400
+        )
+      );
+    }
+  }
+
+  const total =
+    paymentPercentages.first +
+    paymentPercentages.second +
+    paymentPercentages.third;
+
+  if (total !== 100) {
+    return next(
+      new ApiError(
+        `⚠️ مجموع نسب الدفعات يجب أن يكون 100، الحالي: ${total}`,
+        400
+      )
+    );
   }
 
   project.paymentPercentages = paymentPercentages;
@@ -49,8 +97,7 @@ exports.convertContractToExecution = asyncHandler(async (req, res, next) => {
     !payments ||
     payments.first == null ||
     payments.second == null ||
-    payments.third == null ||
-    payments.fourth == null
+    payments.third == null
   ) {
     return next(
       new ApiError(
@@ -65,6 +112,10 @@ exports.convertContractToExecution = asyncHandler(async (req, res, next) => {
   project.executionStatus = {
     state: "in_progress",
   };
+
+  if (project.executionStages && project.executionStages.stage1) {
+    project.executionStages.stage1.status = "in_progress";
+  }
 
   await project.save();
 

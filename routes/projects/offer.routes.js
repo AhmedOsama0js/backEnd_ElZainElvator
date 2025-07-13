@@ -9,7 +9,7 @@ const {
 
 const {
   offerValidator,
-  updateOfferValidator,
+  // updateOfferValidator,
 } = require("../../utils/validators/projectValidator");
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
@@ -29,7 +29,7 @@ router.put(
   allowedTO("moderator"),
   mongoIdValidator,
   checkProjectStatus(["offer"]),
-  updateOfferValidator,
+  offerValidator,
   updateOffer
 );
 

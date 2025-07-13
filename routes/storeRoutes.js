@@ -10,6 +10,7 @@ const {
 } = require("../controllers/storeController");
 
 const { mongoIdValidator } = require("../utils/validators/mongoIdValidator");
+const { createStoreValidator } = require("../utils/validators/storeValidator");
 const { AuthUser, allowedTO } = require("../controllers/authController");
 
 router.get("/", AuthUser, allowedTO("moderator"), getAllStores);
@@ -23,12 +24,19 @@ router.get(
   mongoIdValidator,
   getStoreById
 );
-router.post("/", AuthUser, allowedTO("moderator"), createStore);
+router.post(
+  "/",
+  AuthUser,
+  allowedTO("moderator"),
+  createStoreValidator,
+  createStore
+);
 router.put(
   "/:id",
   AuthUser,
   allowedTO("moderator"),
   mongoIdValidator,
+  createStoreValidator,
   updateStore
 );
 router.delete(

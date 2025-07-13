@@ -23,16 +23,8 @@ const storeSchema = new mongoose.Schema(
 
     category: {
       type: String,
+      enum: ["stage1", "stage2", "stage3"],
       required: true,
-      enum: [
-        "أسلاك",
-        "مفاتيح",
-        "لمبات",
-        "خراطيم",
-        "لوحات",
-        "إكسسوارات",
-        "أخرى",
-      ],
     },
 
     price: {

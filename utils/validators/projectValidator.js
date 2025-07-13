@@ -12,19 +12,24 @@ exports.offerValidator = [
   body("client.phone")
     .notEmpty()
     .withMessage("⚠️ رقم الهاتف مطلوب")
-    .isMobilePhone("ar-EG")
-    .withMessage("⚠️ رقم الهاتف غير صحيح"),
+    .isMobilePhone("ar-SA")
+    .withMessage("⚠️ رقم الهاتف السعودي غير صحيح"),
 
   body("client.address").notEmpty().withMessage("⚠️ العنوان مطلوب"),
 
+  // ---------- مدة المشروع ----------
+  body("durationInDays")
+    .isIn([30, 45, 60])
+    .withMessage("مدة المشروع يجب أن تكون 30 أو 45 أو 60 يومًا"),
+
   // بيانات المصعد
   body("elevator.numberOfElevators")
-    .isNumeric()
-    .withMessage("⚠️ عدد المصاعد يجب أن يكون رقم"),
+    .isInt({ min: 1 })
+    .withMessage("عدد المصاعد مطلوب ويجب أن يكون رقمًا"),
 
-  body("elevator.category").notEmpty().withMessage("⚠️ تصنيف المصعد مطلوب"),
-
-  body("elevator.type").notEmpty().withMessage("⚠️ نوع المصعد مطلوب"),
+  body("elevator.category")
+    .isIn(["automatic", "semi-automatic", "home-lift"])
+    .withMessage("نوع المصعد غير صالح"),
 
   body("elevator.stops")
     .optional()
@@ -42,41 +47,58 @@ exports.offerValidator = [
     .withMessage("⚠️ عدد المداخل يجب أن يكون رقم"),
 
   body("elevator.loadCapacity")
-    .optional()
-    .isString()
-    .withMessage("⚠️ حمولة المصعد يجب أن تكون نص"),
+    .isIn([450, 630, 800])
+    .withMessage("الحمولة يجب أن تكون 450 أو 630 أو 800"),
 
   body("elevator.machineType")
-    .optional()
-    .isString()
-    .withMessage("⚠️ نوع الماكينة يجب أن يكون نص"),
+    .isIn(["chinese", "italian"])
+    .withMessage("نوع الماكينة غير صالح"),
 
   // المواصفات
-  body("specifications.doorType").notEmpty().withMessage("⚠️ نوع الباب مطلوب"),
+  body("specifications.doorType")
+    .isIn(["semi-automatic", "center", "telescope"])
+    .withMessage("نوع الباب غير صالح"),
 
-  body("specifications.doorSize").notEmpty().withMessage("⚠️ مقاس الباب مطلوب"),
+  body("specifications.doorSize")
+    .isIn([70, 80])
+    .withMessage("مقاس الباب يجب أن يكون 70 أو 80"),
 
   body("specifications.innerDoor")
-    .notEmpty()
-    .withMessage("⚠️ نوع الباب الداخلي مطلوب"),
+    .isIn(["automatic", "semi-automatic"])
+    .withMessage("نوع الباب الداخلي غير صالح"),
 
   body("specifications.shaftWidth")
     .notEmpty()
-    .withMessage("⚠️ عرض البئر مطلوب"),
+    .withMessage("⚠️ عرض البئر مطلوب")
+    .isNumeric()
+    .withMessage("  عرض البئر يجب أن يكون رقم"),
 
   body("specifications.shaftLength")
     .notEmpty()
-    .withMessage("⚠️ طول البئر مطلوب"),
+    .withMessage("⚠️ طول البئر مطلوب")
+    .isNumeric()
+    .withMessage("  طول البئر  يجب أن يكون رقم"),
 
   body("specifications.cabinSize")
     .notEmpty()
-    .withMessage("⚠️ مقاس الكابينة مطلوب"),
+    .withMessage("⚠️ مقاس الكابينة مطلوب")
+    .isNumeric()
+    .withMessage(" مقاس الكابينة يجب أن يكون رقم"),
 
-  body("specifications.shaftPit").notEmpty().withMessage("⚠️ عمق البئر مطلوب"),
+  body("specifications.shaftPit")
+    .optional()
+    .isNumeric()
+    .withMessage("عمق البير يجب أن يكون رقم"),
 
   body("specifications.lastFloorHeight")
-    .notEmpty()
-    .withMessage("⚠️ ارتفاع آخر دور مطلوب"),
+    .optional()
+    .isNumeric()
+    .withMessage("ارتفاع آخر دور يجب أن يكون رقم"),
+
+  body("specifications.totalShaftHeight")
+    .optional()
+    .isNumeric()
+    .withMessage("الارتفاع الكلي يجب أن يكون رقم"),
 
   // السعر
   body("pricing.basePrice")
@@ -84,6 +106,7 @@ exports.offerValidator = [
     .withMessage("⚠️ السعر الأساسي يجب أن يكون رقم"),
 
   body("pricing.systemPrice")
+    .optional()
     .isNumeric()
     .withMessage("⚠️ السعر بعد النظام يجب أن يكون رقم"),
 
@@ -97,10 +120,6 @@ exports.offerValidator = [
     .isNumeric()
     .withMessage("⚠️ الضريبة يجب أن تكون رقم"),
 
-  body("pricing.finalPrice")
-    .isNumeric()
-    .withMessage("⚠️ السعر النهائي يجب أن يكون رقم"),
-
   // بيانات إضافية وملاحظات (كلها اختيارية)
   body("representative").optional().isString(),
   body("transferLocation").optional().isString(),
@@ -113,68 +132,68 @@ exports.offerValidator = [
   validatorMiddleware,
 ];
 
-exports.updateOfferValidator = [
-  // ✅ client
-  body("client.category")
-    .optional()
-    .isIn(["individual", "company", "contractor", "real_estate", "government"])
-    .withMessage("⚠️ نوع العميل غير صالح"),
-  body("client.name").optional().isString().withMessage("⚠️ الاسم غير صحيح"),
-  body("client.phone")
-    .optional()
-    .isMobilePhone("ar-EG")
-    .withMessage("⚠️ رقم الهاتف غير صحيح"),
-  body("client.address").optional().notEmpty().withMessage("⚠️ العنوان مطلوب"),
+// exports.updateOfferValidator = [
+//   // ✅ client
+//   body("client.category")
+//     .optional()
+//     .isIn(["individual", "company", "contractor", "real_estate", "government"])
+//     .withMessage("⚠️ نوع العميل غير صالح"),
+//   body("client.name").optional().isString().withMessage("⚠️ الاسم غير صحيح"),
+//   body("client.phone")
+//     .optional()
+//     .isMobilePhone("ar-EG")
+//     .withMessage("⚠️ رقم الهاتف غير صحيح"),
+//   body("client.address").optional().notEmpty().withMessage("⚠️ العنوان مطلوب"),
 
-  // ✅ elevator
-  body("elevator.numberOfElevators")
-    .optional()
-    .isNumeric()
-    .withMessage("⚠️ عدد المصاعد يجب أن يكون رقم"),
-  body("elevator.category").optional().isString(),
-  body("elevator.type").optional().isString(),
-  body("elevator.stops").optional().isNumeric(),
-  body("elevator.floors").optional().isNumeric(),
-  body("elevator.entrances").optional().isNumeric(),
-  body("elevator.loadCapacity").optional().isString(),
-  body("elevator.machineType").optional().isString(),
+//   // ✅ elevator
+//   body("elevator.numberOfElevators")
+//     .optional()
+//     .isNumeric()
+//     .withMessage("⚠️ عدد المصاعد يجب أن يكون رقم"),
+//   body("elevator.category").optional().isString(),
+//   body("elevator.type").optional().isString(),
+//   body("elevator.stops").optional().isNumeric(),
+//   body("elevator.floors").optional().isNumeric(),
+//   body("elevator.entrances").optional().isNumeric(),
+//   body("elevator.loadCapacity").optional().isString(),
+//   body("elevator.machineType").optional().isString(),
 
-  // ✅ elevator.features
-  body("elevator.features.electronicCard").optional().isBoolean(),
-  body("elevator.features.battery").optional().isBoolean(),
-  body("elevator.features.vvvf").optional().isBoolean(),
-  body("elevator.features.warranty").optional().isBoolean(),
-  body("elevator.features.dismantleOldElevator").optional().isBoolean(),
+//   // ✅ elevator.features
+//   body("elevator.features.electronicCard").optional().isBoolean(),
+//   body("elevator.features.battery").optional().isBoolean(),
+//   body("elevator.features.vvvf").optional().isBoolean(),
+//   body("elevator.features.warranty").optional().isBoolean(),
+//   body("elevator.features.dismantleOldElevator").optional().isBoolean(),
 
-  // ✅ specifications
-  body("specifications.doorType").optional().isString(),
-  body("specifications.doorSize").optional().isString(),
-  body("specifications.innerDoor").optional().isString(),
-  body("specifications.shaftWidth").optional().isString(),
-  body("specifications.shaftLength").optional().isString(),
-  body("specifications.cabinSize").optional().isString(),
-  body("specifications.shaftPit").optional().isString(),
-  body("specifications.lastFloorHeight").optional().isString(),
+//   // ✅ specifications
+//   body("specifications.doorType").optional().isString(),
+//   body("specifications.doorSize").optional().isString(),
+//   body("specifications.innerDoor").optional().isString(),
+//   body("specifications.shaftWidth").optional().isString(),
+//   body("specifications.shaftLength").optional().isString(),
+//   body("specifications.cabinSize").optional().isString(),
+//   body("specifications.shaftPit").optional().isString(),
+//   body("specifications.lastFloorHeight").optional().isString(),
 
-  // ✅ pricing
-  body("pricing.basePrice").optional().isNumeric(),
-  body("pricing.systemPrice").optional().isNumeric(),
-  body("pricing.discount").optional().isNumeric(),
-  body("pricing.tax").optional().isNumeric(),
-  body("pricing.finalPrice").optional().isNumeric(),
+//   // ✅ pricing
+//   body("pricing.basePrice").optional().isNumeric(),
+//   body("pricing.systemPrice").optional().isNumeric(),
+//   body("pricing.discount").optional().isNumeric(),
+//   body("pricing.tax").optional().isNumeric(),
+//   body("pricing.finalPrice").optional().isNumeric(),
 
-  // ✅ other fields
-  body("representative").optional().isString(),
-  body("transferLocation").optional().isString(),
+//   // ✅ other fields
+//   body("representative").optional().isString(),
+//   body("transferLocation").optional().isString(),
 
-  // ✅ notes
-  body("notes.note1").optional().isString(),
-  body("notes.note2").optional().isString(),
-  body("notes.note3").optional().isString(),
-  body("notes.note4").optional().isString(),
-  body("notes.note5").optional().isString(),
-  validatorMiddleware,
-];
+//   // ✅ notes
+//   body("notes.note1").optional().isString(),
+//   body("notes.note2").optional().isString(),
+//   body("notes.note3").optional().isString(),
+//   body("notes.note4").optional().isString(),
+//   body("notes.note5").optional().isString(),
+//   validatorMiddleware,
+// ];
 
 exports.executionStageValidator = [
   body("name")
@@ -230,21 +249,12 @@ exports.paymentPercentagesValidator = [
     .isFloat({ min: 0, max: 100 })
     .withMessage("⚠️ الدفعة الثالثة يجب أن تكون بين 0 و 100"),
 
-  body("paymentPercentages.fourth")
-    .notEmpty()
-    .withMessage("⚠️ الدفعة الرابعة مطلوبة")
-    .isFloat({ min: 0, max: 100 })
-    .withMessage("⚠️ الدفعة الرابعة يجب أن تكون بين 0 و 100"),
-
   body().custom((body) => {
     const payments = body.paymentPercentages;
     if (!payments) return true;
 
     const total =
-      (payments.first || 0) +
-      (payments.second || 0) +
-      (payments.third || 0) +
-      (payments.fourth || 0);
+      (payments.first || 0) + (payments.second || 0) + (payments.third || 0);
 
     if (total > 100) {
       throw new Error("⚠️ مجموع الدفعات لا يجب أن يتجاوز 100%");
