@@ -12,23 +12,19 @@ const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
 const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
-router.patch(
-  "/contract/:id",
+router.use(
   AuthUser,
   allowedTO("moderator"),
   mongoIdValidator,
-  paymentPercentagesValidator,
-  checkProjectStatus(["contract"]),
-  updateContractPayments
+  checkProjectStatus(["contract"])
 );
 
 router.patch(
-  "/convert-to-execution/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["contract"]),
-  convertContractToExecution
+  "/contract/:id",
+  paymentPercentagesValidator,
+  updateContractPayments
 );
+
+router.patch("/convert-to-execution/:id", convertContractToExecution);
 
 module.exports = router;

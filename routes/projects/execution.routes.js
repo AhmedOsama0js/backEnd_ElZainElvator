@@ -13,31 +13,19 @@ const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
 const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
-router.post(
-  "/execution/:id",
+router.use(
   AuthUser,
   allowedTO("moderator"),
   mongoIdValidator,
-  checkProjectStatus(["execution"]),
-  executionStageValidator,
-  addExecutionStage
+  checkProjectStatus(["execution"])
 );
+
+router.post("/execution/:id", executionStageValidator, addExecutionStage);
 router.put(
   "/execution/:id/stage/:stageId",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["execution"]),
   executionStageValidator,
   updateExecutionStage
 );
-router.delete(
-  "/execution/:id/stage/:stageId",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["execution"]),
-  deleteExecutionStage
-);
+router.delete("/execution/:id/stage/:stageId", deleteExecutionStage);
 
 module.exports = router;

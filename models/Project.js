@@ -186,7 +186,6 @@ const projectSchema = new mongoose.Schema(
       },
     },
 
-    // مراحل التنفيذ
     executionStages: {
       stage1: executionStageSchema,
       stage2: executionStageSchema,

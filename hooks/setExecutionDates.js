@@ -1,5 +1,19 @@
-const setExecutionDates = function (next) {
-  if (!this.isNew) return next();
+const setExecutionDates = async function (next) {
+  if (this.isNew && this.status !== "execution") {
+    return next();
+  }
+
+  if (!this.isNew && this.isModified("status") && this.status === "execution") {
+    return proceed.call(this, next);
+  }
+
+  return next();
+};
+
+function proceed(next) {
+  if (this.executionStages?.stage1?.startDate) {
+    return next();
+  }
 
   const totalDuration = this.durationInDays;
   const stageDuration = Math.floor(totalDuration / 3);
@@ -9,7 +23,6 @@ const setExecutionDates = function (next) {
   const stageNames = ["سكة وباب", "مكينه وكبينة", "الكهرباء"];
 
   let currentStart = new Date(today);
-
   const executionStages = {};
 
   for (let i = 0; i < 3; i++) {
@@ -34,8 +47,7 @@ const setExecutionDates = function (next) {
   }
 
   this.executionStages = executionStages;
-
   next();
-};
+}
 
 module.exports = setExecutionDates;

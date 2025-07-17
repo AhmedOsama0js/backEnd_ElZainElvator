@@ -13,38 +13,15 @@ const { mongoIdValidator } = require("../utils/validators/mongoIdValidator");
 const { createStoreValidator } = require("../utils/validators/storeValidator");
 const { AuthUser, allowedTO } = require("../controllers/authController");
 
-router.get("/", AuthUser, allowedTO("moderator"), getAllStores);
+router.use(AuthUser, allowedTO("moderator"));
 
-router.get("/store-status", AuthUser, allowedTO("moderator"), getStoreStats); // ضف هذا السطر
+router.get("/", getAllStores);
 
-router.get(
-  "/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  getStoreById
-);
-router.post(
-  "/",
-  AuthUser,
-  allowedTO("moderator"),
-  createStoreValidator,
-  createStore
-);
-router.put(
-  "/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  createStoreValidator,
-  updateStore
-);
-router.delete(
-  "/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  deleteStore
-);
+router.get("/store-status", getStoreStats);
+
+router.get("/:id", mongoIdValidator, getStoreById);
+router.post("/", createStoreValidator, createStore);
+router.put("/:id", mongoIdValidator, createStoreValidator, updateStore);
+router.delete("/:id", mongoIdValidator, deleteStore);
 
 module.exports = router;

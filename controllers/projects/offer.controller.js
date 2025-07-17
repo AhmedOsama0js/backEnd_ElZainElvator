@@ -27,6 +27,12 @@ exports.createOffer = asyncHandler(async (req, res, next) => {
     );
   }
 
+  if (pricing.finalPrice) {
+    return next(
+      new ApiError("⚠️ لا يجب اضافة (finalPrice) لأنه يتم حسابه تلقائيًا", 400)
+    );
+  }
+
   const newProject = await Project.create({
     status: "offer",
     client,
@@ -74,6 +80,12 @@ exports.updateOffer = asyncHandler(async (req, res, next) => {
         "⚠️ لا يمكنك تعديل بيانات العقد أو الدفعات أو مراحل التنفيذ أو الحالة في هذه المرحلة.",
         400
       )
+    );
+  }
+
+  if (pricing.finalPrice) {
+    return next(
+      new ApiError("⚠️ لا يجب اضافة (finalPrice) لأنه يتم حسابه تلقائيًا", 400)
     );
   }
 

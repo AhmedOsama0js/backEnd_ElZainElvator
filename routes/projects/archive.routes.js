@@ -11,31 +11,17 @@ const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
 const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
-router.patch(
-  "/complete-archive/:id",
+router.use(
   AuthUser,
   allowedTO("moderator"),
   checkProjectStatus(["execution"]),
-  mongoIdValidator,
-  completeContractAndArchive
+  mongoIdValidator
 );
 
-router.patch(
-  "/toggle-execution/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  checkProjectStatus(["execution"]),
-  mongoIdValidator,
-  toggleContractExecution
-);
+router.patch("/complete-archive/:id", completeContractAndArchive);
 
-router.patch(
-  "/archive-stopped/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  checkProjectStatus(["execution"]),
-  mongoIdValidator,
-  archiveStoppedContract
-);
+router.patch("/toggle-execution/:id", toggleContractExecution);
+
+router.patch("/archive-stopped/:id", archiveStoppedContract);
 
 module.exports = router;

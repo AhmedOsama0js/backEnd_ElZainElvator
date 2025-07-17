@@ -7,48 +7,21 @@ const {
   convertOfferToContract,
 } = require("../../controllers/projects");
 
-const {
-  offerValidator,
-  // updateOfferValidator,
-} = require("../../utils/validators/projectValidator");
+const { offerValidator } = require("../../utils/validators/projectValidator");
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
 const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
-router.post(
-  "/offer",
-  AuthUser,
-  allowedTO("moderator"),
-  offerValidator,
-  createOffer
-);
+router.use(AuthUser, allowedTO("moderator"));
 
-router.put(
-  "/offer/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["offer"]),
-  offerValidator,
-  updateOffer
-);
+router.post("/offer", offerValidator, createOffer);
 
-router.delete(
-  "/offer/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["offer"]),
-  deleteOffer
-);
+router.use(mongoIdValidator, checkProjectStatus(["offer"]));
 
-router.patch(
-  "/convert-to-contract/:id",
-  AuthUser,
-  allowedTO("moderator"),
-  mongoIdValidator,
-  checkProjectStatus(["offer"]),
-  convertOfferToContract
-);
+router.put("/offer/:id", offerValidator, updateOffer);
+
+router.delete("/offer/:id", deleteOffer);
+
+router.patch("/convert-to-contract/:id", convertOfferToContract);
 
 module.exports = router;

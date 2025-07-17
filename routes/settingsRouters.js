@@ -17,20 +17,18 @@ const {
 
 // setting Routes
 
-router.get("/", AuthUser, allowedTO("moderator"), getAllSettings);
+router.use(AuthUser, allowedTO("moderator"));
+
+router.get("/", getAllSettings);
 
 router.post(
   "/:stageKey",
-  AuthUser,
-  allowedTO("moderator"),
   validateStageParam,
   validateProductBody,
   addProductToStage
 );
 router.put(
   "/:stageKey/update/:productId",
-  AuthUser,
-  allowedTO("moderator"),
   validateStageParam,
   validateProductParam,
   validateProductBody,
@@ -38,8 +36,6 @@ router.put(
 );
 router.delete(
   "/:stageKey/delete/:productId",
-  AuthUser,
-  allowedTO("moderator"),
   validateStageParam,
   validateProductParam,
   deleteProductFromStage
