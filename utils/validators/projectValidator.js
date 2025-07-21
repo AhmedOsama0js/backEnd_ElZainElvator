@@ -1,5 +1,6 @@
 const { body } = require("express-validator");
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
+const ApiError = require("../../utils/ApiError");
 
 exports.offerValidator = [
   // بيانات العميل
@@ -132,69 +133,6 @@ exports.offerValidator = [
   validatorMiddleware,
 ];
 
-// exports.updateOfferValidator = [
-//   // ✅ client
-//   body("client.category")
-//     .optional()
-//     .isIn(["individual", "company", "contractor", "real_estate", "government"])
-//     .withMessage("⚠️ نوع العميل غير صالح"),
-//   body("client.name").optional().isString().withMessage("⚠️ الاسم غير صحيح"),
-//   body("client.phone")
-//     .optional()
-//     .isMobilePhone("ar-EG")
-//     .withMessage("⚠️ رقم الهاتف غير صحيح"),
-//   body("client.address").optional().notEmpty().withMessage("⚠️ العنوان مطلوب"),
-
-//   // ✅ elevator
-//   body("elevator.numberOfElevators")
-//     .optional()
-//     .isNumeric()
-//     .withMessage("⚠️ عدد المصاعد يجب أن يكون رقم"),
-//   body("elevator.category").optional().isString(),
-//   body("elevator.type").optional().isString(),
-//   body("elevator.stops").optional().isNumeric(),
-//   body("elevator.floors").optional().isNumeric(),
-//   body("elevator.entrances").optional().isNumeric(),
-//   body("elevator.loadCapacity").optional().isString(),
-//   body("elevator.machineType").optional().isString(),
-
-//   // ✅ elevator.features
-//   body("elevator.features.electronicCard").optional().isBoolean(),
-//   body("elevator.features.battery").optional().isBoolean(),
-//   body("elevator.features.vvvf").optional().isBoolean(),
-//   body("elevator.features.warranty").optional().isBoolean(),
-//   body("elevator.features.dismantleOldElevator").optional().isBoolean(),
-
-//   // ✅ specifications
-//   body("specifications.doorType").optional().isString(),
-//   body("specifications.doorSize").optional().isString(),
-//   body("specifications.innerDoor").optional().isString(),
-//   body("specifications.shaftWidth").optional().isString(),
-//   body("specifications.shaftLength").optional().isString(),
-//   body("specifications.cabinSize").optional().isString(),
-//   body("specifications.shaftPit").optional().isString(),
-//   body("specifications.lastFloorHeight").optional().isString(),
-
-//   // ✅ pricing
-//   body("pricing.basePrice").optional().isNumeric(),
-//   body("pricing.systemPrice").optional().isNumeric(),
-//   body("pricing.discount").optional().isNumeric(),
-//   body("pricing.tax").optional().isNumeric(),
-//   body("pricing.finalPrice").optional().isNumeric(),
-
-//   // ✅ other fields
-//   body("representative").optional().isString(),
-//   body("transferLocation").optional().isString(),
-
-//   // ✅ notes
-//   body("notes.note1").optional().isString(),
-//   body("notes.note2").optional().isString(),
-//   body("notes.note3").optional().isString(),
-//   body("notes.note4").optional().isString(),
-//   body("notes.note5").optional().isString(),
-//   validatorMiddleware,
-// ];
-
 exports.executionStageValidator = [
   body("name")
     .notEmpty()
@@ -257,7 +195,7 @@ exports.paymentPercentagesValidator = [
       (payments.first || 0) + (payments.second || 0) + (payments.third || 0);
 
     if (total > 100) {
-      throw new Error("⚠️ مجموع الدفعات لا يجب أن يتجاوز 100%");
+      throw new ApiError("⚠️ مجموع الدفعات لا يجب أن يتجاوز 100%");
     }
     return true;
   }),

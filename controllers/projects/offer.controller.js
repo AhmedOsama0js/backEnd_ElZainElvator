@@ -83,6 +83,8 @@ exports.updateOffer = asyncHandler(async (req, res, next) => {
     );
   }
 
+  const { pricing } = allowedFields;
+
   if (pricing.finalPrice) {
     return next(
       new ApiError("⚠️ لا يجب اضافة (finalPrice) لأنه يتم حسابه تلقائيًا", 400)

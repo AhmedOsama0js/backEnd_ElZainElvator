@@ -1,5 +1,7 @@
 const { body } = require("express-validator");
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
+const Store = require("../../models/Store");
+const ApiError = require("../../utils/ApiError");
 
 exports.createStoreValidator = [
   body("name")
@@ -25,6 +27,19 @@ exports.createStoreValidator = [
     .withMessage("⚠️ الفئة مطلوبة.")
     .isIn(["stage1", "stage2", "stage3"])
     .withMessage("⚠️ الفئة غير صحيحة."),
+
+  body("name").custom(async (value, { req }) => {
+    const existingStore = await Store.findOne({
+      name: value.trim(),
+      category: req.body.category,
+    });
+
+    if (existingStore) {
+      throw new ApiError("⚠️ هذا الاسم موجود بالفعل داخل نفس القسم.");
+    }
+
+    return true;
+  }),
 
   body("price")
     .notEmpty()

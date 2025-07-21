@@ -8,7 +8,7 @@ const globalError = (err, req, res, next) => {
   err.status = err.status || "error";
 
   // Determine how to send the error based on the application environment
-  if (process.env.NODE_MODE === "develop") {
+  if (process.env.NODE_MODE === "dev") {
     return sendErrorForDev(err, res);
   } else {
     return sendErrorForPro(err, res);

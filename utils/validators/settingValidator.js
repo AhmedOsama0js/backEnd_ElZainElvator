@@ -1,17 +1,7 @@
 const { body, param } = require("express-validator");
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
-
-const validStages = ["stage1Products", "stage2Products", "stage3Products"];
-
-// ✅ للتحقق من stageKey في params
-exports.validateStageParam = [
-  param("stageKey")
-    .notEmpty()
-    .withMessage("⚠️ اسم المرحلة مطلوب")
-    .isIn(validStages)
-    .withMessage("⚠️ اسم المرحلة غير صحيح"),
-  validatorMiddleware,
-];
+const Store = require("../../models/Store");
+const ApiError = require("../../utils/ApiError");
 
 exports.validateProductParam = [
   param("productId")
@@ -22,13 +12,27 @@ exports.validateProductParam = [
   validatorMiddleware,
 ];
 
-// ✅ للتحقق من body عند الإضافة أو التعديل
 exports.validateProductBody = [
   body("product")
     .notEmpty()
     .withMessage("⚠️ المنتج مطلوب")
     .isMongoId()
-    .withMessage("⚠️ رقم المنتج غير صالح"),
+    .withMessage("⚠️ رقم المنتج غير صالح")
+    .custom(async (value, { req }) => {
+      const product = await Store.findById(value);
+      if (!product) {
+        throw new ApiError("⚠️ المنتج غير موجود في قاعدة البيانات");
+      }
+
+      if (product.category.toString() !== req.params.stageKey) {
+        throw new ApiError(
+          "⚠️ هذا المنتج لا يتبع المرحلة المحددة في الرابط",
+          400
+        );
+      }
+
+      return true;
+    }),
 
   body("quantity")
     .notEmpty()

@@ -101,7 +101,7 @@ exports.convertContractToExecution = asyncHandler(async (req, res, next) => {
   ) {
     return next(
       new ApiError(
-        "⚠️ يجب إتمام بيانات الدفعات الأربعة قبل دخول مرحلة التنفيذ.",
+        "⚠️ يجب إتمام بيانات الدفعات الثلاثة قبل دخول مرحلة التنفيذ.",
         400
       )
     );

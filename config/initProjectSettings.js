@@ -8,9 +8,9 @@ const initProjectSettings = async () => {
     console.log("🔧 جاري إنشاء إعدادات المراحل الافتراضية...");
 
     const defaultSettings = new Settings({
-      stage1Products: [],
-      stage2Products: [],
-      stage3Products: [],
+      stage1: [],
+      stage2: [],
+      stage3: [],
     });
 
     await defaultSettings.save();

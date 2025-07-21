@@ -9,7 +9,6 @@ exports.getProjects = asyncHandler(async (req, res) => {
     .search([
       "client.name",
       "client.phone",
-      "client.category",
       "contract.number",
       "elevator.category",
       "notes.note1",

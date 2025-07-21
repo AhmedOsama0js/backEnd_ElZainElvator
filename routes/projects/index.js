@@ -1,11 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-router.use(require("./offer.routes"));
-router.use(require("./contract.routes"));
-router.use(require("./execution.routes"));
-router.use(require("./archive.routes"));
-
 const {
   getProjects,
   getProjectById,
@@ -15,6 +10,11 @@ const {
 
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const { AuthUser, allowedTO } = require("../../controllers/authController");
+
+router.use("/offer", require("./offer.routes"));
+router.use("/contract", require("./contract.routes"));
+router.use("/execution", require("./execution.routes"));
+router.use("/archive", require("./archive.routes"));
 
 router.get("/", AuthUser, allowedTO("moderator"), getProjects);
 router.get(

@@ -14,14 +14,28 @@ const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
 router.use(AuthUser, allowedTO("moderator"));
 
-router.post("/offer", offerValidator, createOffer);
+router.post("/", offerValidator, createOffer);
 
-router.use(mongoIdValidator, checkProjectStatus(["offer"]));
+router.put(
+  "/:id",
+  mongoIdValidator,
+  checkProjectStatus(["offer"]),
+  offerValidator,
+  updateOffer
+);
 
-router.put("/offer/:id", offerValidator, updateOffer);
+router.delete(
+  "/:id",
+  mongoIdValidator,
+  checkProjectStatus(["offer"]),
+  deleteOffer
+);
 
-router.delete("/offer/:id", deleteOffer);
-
-router.patch("/convert-to-contract/:id", convertOfferToContract);
+router.patch(
+  "/convert-to-contract/:id",
+  mongoIdValidator,
+  checkProjectStatus(["offer"]),
+  convertOfferToContract
+);
 
 module.exports = router;

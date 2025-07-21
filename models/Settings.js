@@ -11,9 +11,9 @@ const stageProductSchema = new mongoose.Schema({
 
 const projectSettingsSchema = new mongoose.Schema(
   {
-    stage1Products: [stageProductSchema],
-    stage2Products: [stageProductSchema],
-    stage3Products: [stageProductSchema],
+    stage1: [stageProductSchema],
+    stage2: [stageProductSchema],
+    stage3: [stageProductSchema],
   },
   {
     timestamps: true,

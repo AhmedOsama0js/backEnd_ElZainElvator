@@ -2,7 +2,7 @@
 const Settings = require("../models/Settings");
 const asyncHandler = require("express-async-handler");
 
-const validStages = ["stage1Products", "stage2Products", "stage3Products"];
+const validStages = ["stage1", "stage2", "stage3"];
 
 function validateStageKey(stageKey) {
   return validStages.includes(stageKey);
@@ -23,6 +23,7 @@ exports.addProductToStage = async (req, res, next) => {
   const exists = settings[stageKey].find(
     (p) => p.product.toString() === product
   );
+
   if (exists)
     return res.status(400).json({ message: "⚠️ المنتج موجود بالفعل" });
 
@@ -86,7 +87,7 @@ exports.getAllSettings = asyncHandler(async (req, res, next) => {
     productName,
   } = req.query;
 
-  const validStages = ["stage1Products", "stage2Products", "stage3Products"];
+  const validStages = ["stage1", "stage2", "stage3"];
   const skip = (page - 1) * limit;
 
   let selectedStages;

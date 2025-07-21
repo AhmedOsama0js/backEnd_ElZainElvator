@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const ApiError = require("../utils/ApiError");
 
 const assignContractNumber = async function (next) {
   if (this.contract.number) return next();
@@ -25,7 +26,7 @@ const assignContractNumber = async function (next) {
   });
 
   if (exists) {
-    return next(new Error("حدث تكرار في رقم العقد، حاول مرة أخرى"));
+    return next(new ApiError("حدث تكرار في رقم العقد، حاول مرة أخرى"));
   }
 
   this.contract.seq = nextSeq;

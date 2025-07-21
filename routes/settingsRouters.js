@@ -10,10 +10,10 @@ const {
 } = require("../controllers/settingController");
 
 const {
-  validateStageParam,
   validateProductParam,
   validateProductBody,
 } = require("../utils/validators/settingValidator");
+const { validateStageParam } = require("../utils/validators/stageKeyValidator");
 
 // setting Routes
 

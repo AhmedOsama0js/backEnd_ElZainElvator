@@ -37,7 +37,7 @@ function proceed(next) {
       startDate: currentStart,
       endDate: currentEnd,
       completed: false,
-      status: "pending",
+      status: i === 0 ? "in_progress" : "pending",
       notes: "",
       productsUsed: [],
     };
