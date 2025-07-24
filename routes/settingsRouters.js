@@ -16,26 +16,29 @@ const {
 const { validateStageParam } = require("../utils/validators/stageKeyValidator");
 
 // setting Routes
-
-router.use(AuthUser, allowedTO("moderator"));
-
-router.get("/", getAllSettings);
+router.get("/", AuthUser, allowedTO("moderator"), getAllSettings);
 
 router.post(
   "/:stageKey",
+  AuthUser,
+  allowedTO("moderator"),
   validateStageParam,
   validateProductBody,
   addProductToStage
 );
 router.put(
-  "/:stageKey/update/:productId",
+  "/:stageKey/update",
+  AuthUser,
+  allowedTO("moderator"),
   validateStageParam,
-  validateProductParam,
   validateProductBody,
   updateProductInStage
 );
+
 router.delete(
   "/:stageKey/delete/:productId",
+  AuthUser,
+  allowedTO("moderator"),
   validateStageParam,
   validateProductParam,
   deleteProductFromStage

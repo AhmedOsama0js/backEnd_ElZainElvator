@@ -34,7 +34,7 @@ exports.createStoreValidator = [
       category: req.body.category,
     });
 
-    if (existingStore) {
+    if (existingStore && existingStore._id.toString() !== req.params.id) {
       throw new ApiError("⚠️ هذا الاسم موجود بالفعل داخل نفس القسم.");
     }
 

@@ -3,6 +3,7 @@ mongoose.models.Project && delete mongoose.models.Project;
 const assignContractNumber = require("../hooks/assignContractNumber");
 const setExecutionDates = require("../hooks/setExecutionDates");
 const finalPrice = require("../hooks/finalPrice");
+const finalPriceUpdate = require("../hooks/finalPriceUpdate");
 
 // ---------------------------
 //   الجزء الخاص بمراحل التنفيز
@@ -202,6 +203,7 @@ projectSchema.pre("save", assignContractNumber);
 projectSchema.pre("save", setExecutionDates);
 
 projectSchema.pre("save", finalPrice);
+projectSchema.pre("findOneAndUpdate", finalPriceUpdate);
 
 const Project = mongoose.model("Project", projectSchema);
 
