@@ -63,7 +63,10 @@ exports.updateProductInStage = async (req, res, next) => {
   item.quantity = quantity;
   await settings.save();
 
-  res.json({ message: "✅ تم التعديل بنجاح" });
+  // 📦 جلب اسم المنتج
+  const productDoc = await Store.findById(product);
+
+  res.json({ message: "✅ تم التعديل بنجاح", quantity, product: productDoc });
 };
 
 exports.deleteProductFromStage = async (req, res, next) => {

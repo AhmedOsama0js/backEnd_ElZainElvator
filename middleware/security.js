@@ -39,7 +39,7 @@ const suspiciousBlocker = (req, res, next) => {
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000,
-  max: 100,
+  max: 200,
   message: "⛔ Too many requests, try again later.",
   handler: (req, res, next) => {
     logger.warn({
@@ -50,9 +50,9 @@ const limiter = rateLimit({
       type: "rate-limit",
     });
 
-    res
-      .status(429)
-      .send("⛔ تم حظر الوصول مؤقتًا بسبب عدد كبير من الطلبات. حاول لاحقًا.");
+    res.status(429).send({
+      message: "⛔ تم حظر الوصول مؤقتًا بسبب عدد كبير من الطلبات. حاول لاحقًا.",
+    });
   },
 });
 

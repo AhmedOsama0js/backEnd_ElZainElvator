@@ -3,11 +3,12 @@ const Store = require("../models/Store");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError");
 const ApiFetcher = require("../utils/ApiFetcher");
+const removeProductFromSettings = require("../hooks/removeProductFromSettings");
 
 exports.getAllStores = asyncHandler(async (req, res, next) => {
   const api = new ApiFetcher(Store.find(), req.query)
     .filter()
-    .search(["name", "quantity", "category", "price", "notes"])
+    .search(["name", "category", "notes"])
     .sort()
     .paginate();
 
@@ -98,6 +99,8 @@ exports.deleteStore = asyncHandler(async (req, res, next) => {
   if (!store) return next(new ApiError("❌ المتجر غير موجود", 404));
 
   await store.deleteOne();
+
+  await removeProductFromSettings(id);
 
   res.status(200).json({
     message: "🗑️ تم حذف المتجر بنجاح",
