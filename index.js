@@ -37,6 +37,7 @@ const authRoute = require("./routes/authRouters");
 const projectRoutes = require("./routes/projects");
 const storeRoutes = require("./routes/storeRoutes");
 const settingsRouters = require("./routes/settingsRouters");
+const teamMessageRouters = require("./routes/teamMessageRouters");
 
 if (process.env.NODE_MODE === "dev") {
   app.use(morgan("dev"));
@@ -46,6 +47,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/project", projectRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/setting", settingsRouters);
+app.use("/api/teamMessage", teamMessageRouters);
 
 app.use((req, res, next) => {
   next(new ApiError(`Cannot find ${req.originalUrl} on this server ⚠️`, 404));
