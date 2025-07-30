@@ -30,8 +30,6 @@ exports.addExecutionStageProduct = asyncHandler(async (req, res, next) => {
     };
   });
 
-  console.log(project.executionStages[stageKey].completed);
-
   project.executionStages[stageKey].productsUsed = preparedProducts;
 
   await project.save();
@@ -52,7 +50,6 @@ exports.completeStages = asyncHandler(async (req, res, next) => {
   }
 
   const projectStage = project.executionStages[stageKey];
-  console.log(projectStage);
 
   if (!projectStage) {
     return next(new ApiError("⚠️ المرحلة المطلوبة غير موجودة", 404));
@@ -67,14 +64,35 @@ exports.completeStages = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // تحديث الحالة
   project.executionStages[stageKey].status = "completed";
   project.executionStages[stageKey].completed = true;
+
+  const stageKeys = Object.keys(project.executionStages).sort();
+
+  const currentIndex = stageKeys.indexOf(stageKey);
+  const nextStageKey = stageKeys[currentIndex + 1];
+
+  if (nextStageKey) {
+    if (project.executionStages[nextStageKey].status === "pending") {
+      project.executionStages[nextStageKey].status = "in_progress";
+    }
+  }
+
+  const allStagesCompleted = stageKeys.every(
+    (key) => project.executionStages[key].completed === true
+  );
+
+  if (allStagesCompleted) {
+    project.executionStatus.state = "completed";
+  }
 
   await project.save();
 
   res.status(200).json({
     message: `✅ تم إكمال المرحلة (${stageKey}) بنجاح`,
-    stage: project.executionStages[stageKey],
+    currentStage: project.executionStages[stageKey],
+    nextStage: nextStageKey
+      ? project.executionStages[nextStageKey].status
+      : null,
   });
 });
