@@ -1,20 +1,38 @@
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../../utils/ApiError");
-const Settings = require("../../models/Settings");
 
 exports.addExecutionStageProduct = asyncHandler(async (req, res, next) => {
   const project = req.project;
   const { stageKey } = req.params;
+  const { productsUsed } = req.body;
 
-  const settings = await Settings.findOne();
-
-  if (!settings || !settings[stageKey]) {
-    return next(new ApiError("⚠️ المرحلة غير موجودة في الإعدادات", 404));
+  if (!Array.isArray(productsUsed) || productsUsed.length === 0) {
+    return next(new ApiError("⚠️ يجب إرسال مصفوفة من المنتجات", 400));
   }
 
-  const stageData = settings[stageKey];
+  if (project.executionStages[stageKey].completed) {
+    return next(
+      new ApiError(
+        "⚠️ لا يمكن اضافة  او تعديل المنتجات بعد اكتمال المرحلة",
+        400
+      )
+    );
+  }
 
-  project.executionStages[stageKey].productsUsed.push(...stageData);
+  const preparedProducts = productsUsed.map((item) => {
+    return {
+      product: item.product,
+      name: item.name,
+      price: item.price,
+      unit: item.unit,
+      category: item.category,
+      quantity: item.quantity,
+    };
+  });
+
+  console.log(project.executionStages[stageKey].completed);
+
+  project.executionStages[stageKey].productsUsed = preparedProducts;
 
   await project.save();
 
@@ -60,47 +78,3 @@ exports.completeStages = asyncHandler(async (req, res, next) => {
     stage: project.executionStages[stageKey],
   });
 });
-
-// exports.updateExecutionStage = asyncHandler(async (req, res, next) => {
-//   const project = req.project;
-//   const stageId = req.params.stageId;
-//   const stage = project.executionStages.id(stageId);
-
-//   if (!stage) {
-//     return next(new ApiError("⚠️ لم يتم العثور على مرحلة التنفيذ", 404));
-//   }
-
-//   const { name, description, startDate, endDate, completed, notes } = req.body;
-
-//   if (name !== undefined) stage.name = name;
-//   if (description !== undefined) stage.description = description;
-//   if (startDate !== undefined) stage.startDate = startDate;
-//   if (endDate !== undefined) stage.endDate = endDate;
-//   if (completed !== undefined) stage.completed = completed;
-//   if (notes !== undefined) stage.notes = notes;
-
-//   await project.save();
-
-//   res.status(200).json({
-//     message: "✅ تم تعديل مرحلة التنفيذ بنجاح",
-//     data: stage,
-//   });
-// });
-
-// exports.deleteExecutionStage = asyncHandler(async (req, res, next) => {
-//   const project = req.project;
-//   const stageId = req.params.stageId;
-
-//   const stage = project.executionStages.id(stageId);
-//   if (!stage) {
-//     return next(new ApiError("⚠️ لم يتم العثور على مرحلة التنفيذ", 404));
-//   }
-
-//   project.executionStages.pull(stageId);
-
-//   await project.save();
-
-//   res.status(200).json({
-//     message: "🗑️ تم حذف مرحلة التنفيذ بنجاح",
-//   });
-// });

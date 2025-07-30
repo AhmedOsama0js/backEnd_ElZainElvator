@@ -1,19 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const {
-  // deleteExecutionStage,
-  // updateExecutionStage,
   addExecutionStageProduct,
   completeStages,
 } = require("../../controllers/projects");
 
-// const {
-//   executionStageValidator,
-// } = require("../../utils/validators/projectValidator");
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
 const {
   validateStageParam,
 } = require("../../utils/validators/stageKeyValidator");
+const {
+  addExecutionStageProductValidator,
+} = require("../../utils/validators/executionValidator");
+
 const { AuthUser, allowedTO } = require("../../controllers/authController");
 const checkProjectStatus = require("../../middleware/checkProjectStatus");
 
@@ -24,6 +23,7 @@ router.post(
   mongoIdValidator,
   validateStageParam,
   checkProjectStatus(["execution"]),
+  addExecutionStageProductValidator,
   addExecutionStageProduct
 );
 

@@ -23,7 +23,13 @@ const executionStageSchema = new mongoose.Schema(
     notes: String,
     productsUsed: [
       {
-        product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+        product: {
+          _id: mongoose.Schema.Types.ObjectId,
+          name: String,
+          unit: String,
+          price: Number,
+          category: String,
+        },
         quantity: Number,
       },
     ],
@@ -142,6 +148,7 @@ const projectSchema = new mongoose.Schema(
         enum: ["automatic", "semi-automatic"],
         required: true,
       },
+
       shaftWidth: Number,
       shaftLength: Number,
       cabinSize: Number,
@@ -203,6 +210,7 @@ projectSchema.pre("save", assignContractNumber);
 projectSchema.pre("save", setExecutionDates);
 
 projectSchema.pre("save", finalPrice);
+
 projectSchema.pre("findOneAndUpdate", finalPriceUpdate);
 
 const Project = mongoose.model("Project", projectSchema);
