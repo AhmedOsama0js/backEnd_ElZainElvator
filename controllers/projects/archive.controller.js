@@ -4,7 +4,9 @@ const ApiError = require("../../utils/ApiError");
 exports.completeContractAndArchive = asyncHandler(async (req, res, next) => {
   const project = req.project;
 
-  const allStagesCompleted = project.executionStages.every(
+  console.log(Object.values(project.executionStages));
+
+  const allStagesCompleted = Object.values(project.executionStages).every(
     (stage) => stage.completed === true
   );
 
@@ -16,10 +18,6 @@ exports.completeContractAndArchive = asyncHandler(async (req, res, next) => {
       )
     );
   }
-
-  project.executionStatus = {
-    state: "completed",
-  };
 
   project.status = "archived";
 
