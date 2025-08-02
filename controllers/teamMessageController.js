@@ -1,9 +1,7 @@
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("express-async-handler");
-const TelegramBot = require("node-telegram-bot-api");
-const TOKEN = process.env.BOT_TOKEN;
+const { telegramBot } = require("../utils/telegramBot");
 const chatIds = process.env.CHAT_IDS.split(",");
-const bot = new TelegramBot(TOKEN, { polling: true });
 
 exports.sendMessage = asyncHandler(async (req, res, next) => {
   const { name, phone, message } = req.body;
@@ -59,7 +57,7 @@ exports.sendMessage = asyncHandler(async (req, res, next) => {
 
   for (const id of chatIds) {
     try {
-      await bot.sendMessage(id.trim(), text, {
+      await telegramBot.sendMessage(id.trim(), text, {
         parse_mode: "HTML",
         disable_web_page_preview: true,
       });
