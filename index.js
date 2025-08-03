@@ -8,7 +8,13 @@ const errorHandler = require("./middleware/errorMiddleware");
 const ApiError = require("./utils/ApiError");
 const cors = require("cors");
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const path = require("path");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://lucateam.me3adbot.shop",
+];
 
 const app = express();
 app.use(express.json());
@@ -32,6 +38,8 @@ app.use(
 connectDB();
 initProjectSettings();
 
+app.use(express.static(path.join(__dirname, "public")));
+
 const usersRoute = require("./routes/usersRoutes");
 const authRoute = require("./routes/authRouters");
 const projectRoutes = require("./routes/projects");
@@ -48,6 +56,17 @@ app.use("/api/project", projectRoutes);
 app.use("/api/store", storeRoutes);
 app.use("/api/setting", settingsRouters);
 app.use("/api/teamMessage", teamMessageRouters);
+
+app.get("*", (req, res, next) => {
+  if (!req.originalUrl.startsWith("/api")) {
+    return res.sendFile(path.join(__dirname, "public", "index.html"));
+  } else {
+    next(
+      new ApiError(`Sorry, this URL ${req.originalUrl} does not exist`, 400)
+    );
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   next(new ApiError(`Cannot find ${req.originalUrl} on this server ⚠️`, 404));
