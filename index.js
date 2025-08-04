@@ -13,7 +13,8 @@ const path = require("path");
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://uptowersaudi.com/",
+  "https://uptowersaudi.com",
+  "https://www.uptowersaudi.com",
 ];
 
 const app = express();
