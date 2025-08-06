@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const updatePasswordChangedAt = require("../hooks/updatePasswordChangedAt");
+const hashPassword = require("../hooks/hashPassword");
 
 const userSchema = new mongoose.Schema(
   {
@@ -26,14 +28,16 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "moderator"],
       default: "user",
     },
+    passwordChangeAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 12);
-  }
+userSchema.pre("save", hashPassword);
+userSchema.pre("save", function (next) {
+  updatePasswordChangedAt(this);
   next();
 });
 

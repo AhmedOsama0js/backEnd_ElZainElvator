@@ -12,9 +12,12 @@ const finalPrice = function (next) {
     const base = getValidNumber(this.pricing.basePrice);
     const system = getValidNumber(this.pricing.systemPrice);
     const discount = getValidNumber(this.pricing.discount);
-    const tax = getValidNumber(this.pricing.tax);
+    const taxRate = getValidNumber(this.pricing.tax);
 
-    let final = base + system - discount + tax;
+    const priceBeforeTax = base + system - discount;
+    const taxAmount = priceBeforeTax * (taxRate / 100);
+
+    let final = priceBeforeTax + taxAmount;
 
     final = final < 0 ? 0 : final;
 
@@ -25,4 +28,5 @@ const finalPrice = function (next) {
 
   next();
 };
+
 module.exports = finalPrice;

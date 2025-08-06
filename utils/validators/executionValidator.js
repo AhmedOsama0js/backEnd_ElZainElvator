@@ -1,4 +1,4 @@
-const { body, param } = require("express-validator");
+const { body } = require("express-validator");
 const validatorMiddleware = require("../../middleware/validatorMiddleware");
 
 exports.addExecutionStageProductValidator = [
@@ -38,5 +38,27 @@ exports.addExecutionStageProductValidator = [
     }
     return true;
   }),
+  validatorMiddleware,
+];
+
+exports.addBondValidation = [
+  body("receiptNumber")
+    .notEmpty()
+    .withMessage("⚠️ يجب إدخال رقم السند")
+    .isString()
+    .withMessage("⚠️ رقم السند يجب أن يكون نص"),
+
+  body("amountPaid")
+    .notEmpty()
+    .withMessage("⚠️ يجب إدخال المبلغ المدفوع")
+    .isNumeric()
+    .withMessage("⚠️ المبلغ المدفوع يجب أن يكون رقم")
+    .custom((value) => {
+      if (value < 0) {
+        throw new Error("⚠️ المبلغ المدفوع لا يمكن أن يكون أقل من 0");
+      }
+      return true;
+    }),
+
   validatorMiddleware,
 ];

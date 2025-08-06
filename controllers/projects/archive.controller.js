@@ -94,3 +94,20 @@ exports.archiveStoppedContract = asyncHandler(async (req, res, next) => {
     data: project,
   });
 });
+
+exports.archiveActiveContract = asyncHandler(async (req, res, next) => {
+  const project = req.project;
+
+  if (project.executionStatus?.state !== "stopped") {
+    return next(new ApiError("⚠️ يجب ان يكون العقد غير مكتمل لأرجاعه ", 400));
+  }
+
+  project.status = "execution";
+
+  await project.save();
+
+  res.status(200).json({
+    message: "📦 تم ارجاع العقد المتوقف من الارشيف  الي التفيز",
+    data: project,
+  });
+});

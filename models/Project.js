@@ -21,6 +21,15 @@ const executionStageSchema = new mongoose.Schema(
     endDate: Date,
     completed: { type: Boolean, default: false },
     notes: String,
+    receiptNumber: {
+      type: String,
+      trim: true,
+    },
+    amountPaid: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
     productsUsed: [
       {
         product: {
@@ -161,8 +170,12 @@ const projectSchema = new mongoose.Schema(
     pricing: {
       basePrice: Number,
       systemPrice: Number,
-      discount: Number, // اختياري
-      tax: Number, // اختياري
+      discount: Number,
+      tax: {
+        type: Number,
+        enum: [0, 15],
+        default: 0,
+      },
       finalPrice: Number,
     },
 

@@ -5,6 +5,7 @@ const {
   completeContractAndArchive,
   toggleContractExecution,
   archiveStoppedContract,
+  archiveActiveContract,
 } = require("../../controllers/projects");
 
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
@@ -36,6 +37,15 @@ router.patch(
   checkProjectStatus(["execution"]),
   mongoIdValidator,
   archiveStoppedContract
+);
+
+router.patch(
+  "/archive-active/:id",
+  AuthUser,
+  allowedTO("moderator"),
+  checkProjectStatus(["archived"]),
+  mongoIdValidator,
+  archiveActiveContract
 );
 
 module.exports = router;

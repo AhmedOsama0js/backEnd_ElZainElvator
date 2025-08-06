@@ -118,8 +118,8 @@ exports.offerValidator = [
 
   body("pricing.tax")
     .optional()
-    .isNumeric()
-    .withMessage("⚠️ الضريبة يجب أن تكون رقم"),
+    .isIn([0, 15])
+    .withMessage("⚠️ الضريبة يجب أن تكون إما 0 أو 15 فقط"),
 
   // بيانات إضافية وملاحظات (كلها اختيارية)
   body("representative").optional().isString(),

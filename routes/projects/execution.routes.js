@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   addExecutionStageProduct,
   completeStages,
+  AddAmountOfTheBondNumber,
 } = require("../../controllers/projects");
 
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
@@ -11,6 +13,7 @@ const {
 } = require("../../utils/validators/stageKeyValidator");
 const {
   addExecutionStageProductValidator,
+  addBondValidation,
 } = require("../../utils/validators/executionValidator");
 
 const { AuthUser, allowedTO } = require("../../controllers/authController");
@@ -22,13 +25,24 @@ router.post(
   allowedTO("moderator"),
   mongoIdValidator,
   validateStageParam,
-  checkProjectStatus(["execution"]),
   addExecutionStageProductValidator,
+  checkProjectStatus(["execution"]),
   addExecutionStageProduct
 );
 
 router.patch(
-  "/:id/stages/:stageKey",
+  "/:id/stages/:stageKey/bond",
+  AuthUser,
+  allowedTO("moderator"),
+  mongoIdValidator,
+  validateStageParam,
+  addBondValidation,
+  checkProjectStatus(["execution"]),
+  AddAmountOfTheBondNumber
+);
+
+router.patch(
+  "/:id/stages/:stageKey/complete",
   AuthUser,
   allowedTO("moderator"),
   mongoIdValidator,
@@ -36,24 +50,5 @@ router.patch(
   checkProjectStatus(["execution"]),
   completeStages
 );
-
-// router.put(
-//   "/:id/stage/:stageId",
-//   AuthUser,
-//   allowedTO("moderator"),
-//   mongoIdValidator,
-//   checkProjectStatus(["execution"]),
-//   executionStageValidator,
-//   updateExecutionStage
-// );
-
-// router.delete(
-//   "/:id/stage/:stageId",
-//   AuthUser,
-//   allowedTO("moderator"),
-//   mongoIdValidator,
-//   checkProjectStatus(["execution"]),
-//   deleteExecutionStage
-// );
 
 module.exports = router;

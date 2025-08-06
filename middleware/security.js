@@ -27,7 +27,7 @@ const suspiciousBlocker = (req, res, next) => {
       ip: req.ip,
       url: req.originalUrl,
       status: 403,
-      reason: "نمط مشبوه",
+      reason: `نمط مشبوه (${req.url})`,
       type: "suspicious-request",
     });
 
