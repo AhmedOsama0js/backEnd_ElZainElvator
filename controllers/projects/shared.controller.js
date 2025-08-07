@@ -129,3 +129,87 @@ exports.getMonthlyProjectStats = asyncHandler(async (req, res, next) => {
     stats,
   });
 });
+
+exports.getExecutionStatistics = asyncHandler(async (req, res, next) => {
+  const stats = await Project.aggregate([
+    {
+      $match: { status: "execution" }, // العقود في مرحلة التنفيذ
+    },
+    {
+      $addFields: {
+        totalPaid: {
+          $add: [
+            { $ifNull: ["$executionStages.stage1.amountPaid", 0] },
+            { $ifNull: ["$executionStages.stage2.amountPaid", 0] },
+            { $ifNull: ["$executionStages.stage3.amountPaid", 0] },
+          ],
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        contractNumber: "$contract.number",
+        clientName: "$client.name",
+        finalPrice: "$pricing.finalPrice",
+        totalPaid: 1,
+        unpaid: {
+          $subtract: ["$pricing.finalPrice", "$totalPaid"],
+        },
+        contractStatus: "$executionStatus.state", // حالة العقد الحالية
+        stagesStatus: {
+          stage1: "$executionStages.stage1.status",
+          stage2: "$executionStages.stage2.status",
+          stage3: "$executionStages.stage3.status",
+        },
+        stagesPaid: {
+          stage1: "$executionStages.stage1.amountPaid",
+          stage2: "$executionStages.stage2.amountPaid",
+          stage3: "$executionStages.stage3.amountPaid",
+        },
+      },
+    },
+    {
+      $sort: { totalPaid: -1 },
+    },
+  ]);
+  res.status(200).json({
+    data: stats,
+  });
+});
+
+exports.allExecutionStatistics = asyncHandler(async (req, res, next) => {
+  const summary = await Project.aggregate([
+    {
+      $match: { status: "execution" },
+    },
+    {
+      $addFields: {
+        totalPaid: {
+          $add: [
+            "$executionStages.stage1.amountPaid",
+            "$executionStages.stage2.amountPaid",
+            "$executionStages.stage3.amountPaid",
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalContracts: { $sum: 1 },
+        totalFinalPrice: { $sum: "$pricing.finalPrice" },
+        totalPaid: { $sum: "$totalPaid" },
+        totalUnpaid: {
+          $sum: {
+            $subtract: ["$pricing.finalPrice", "$totalPaid"],
+          },
+        },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    data: summary,
+  });
+});

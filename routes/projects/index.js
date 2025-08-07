@@ -6,6 +6,8 @@ const {
   getProjectById,
   getProjectStats,
   getMonthlyProjectStats,
+  getExecutionStatistics,
+  allExecutionStatistics,
 } = require("../../controllers/projects");
 
 const { mongoIdValidator } = require("../../utils/validators/mongoIdValidator");
@@ -17,6 +19,18 @@ router.use("/execution", require("./execution.routes"));
 router.use("/archive", require("./archive.routes"));
 
 router.get("/", AuthUser, allowedTO("moderator"), getProjects);
+router.get(
+  "/project-execution-status",
+  AuthUser,
+  allowedTO("moderator"),
+  getExecutionStatistics
+);
+router.get(
+  "/all-execution-status",
+  AuthUser,
+  allowedTO("moderator"),
+  allExecutionStatistics
+);
 router.get(
   "/project-status",
   AuthUser,
