@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>طباعة تفاصيل العقد</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        padding: 40px;
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        color: #000;
+      }
+
+      h1 {
+        text-align: center;
+        color: #4a148c;
+        margin-bottom: 30px;
+      }
+
+      #content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+      }
+
+      .section {
+        background: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgb(0 0 0 / 0.1);
+        padding: 15px 20px;
+        width: 48%;
+        box-sizing: border-box;
+        margin-bottom: 15px;
+        transition: box-shadow 0.3s ease;
+      }
+
+      .section:hover {
+        box-shadow: 0 9px 24px rgb(0 0 0 / 0.15);
+      }
+
+      .section h2 {
+        font-size: 18px;
+        color: #1a237e;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #aaa;
+        padding-bottom: 5px;
+      }
+
+      .section p,
+      .section li {
+        margin: 4px 10px;
+        line-height: 1.6;
+      }
+
+      .highlight {
+        font-weight: bold;
+        color: #d32f2f;
+      }
+
+      ul {
+        padding-inline-start: 20px;
+      }
+
+      /* سطر كامل العرض للكروت التي تحتاج العرض الكامل */
+      .full-width {
+        width: 100% !important;
+      }
+
+      @media print {
+        button {
+          display: none;
+        }
+        body {
+          background: white;
+          padding: 0;
+          max-width: 100%;
+          margin: 0;
+        }
+        #content {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: 20px !important;
+          justify-content: center !important;
+        }
+        .section {
+          box-shadow: none;
+          border: 1px solid #ddd;
+          border-radius: 0;
+          margin-bottom: 15px;
+          padding: 15px;
+          width: 48% !important;
+        }
+        .section:hover {
+          box-shadow: none;
+        }
+        .full-width {
+          width: 100% !important;
+          border: 1px solid #ddd !important;
+          border-radius: 0 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>تفاصيل العقد</h1>
+
+    <div id="content">جاري تحميل البيانات...</div>
+
+    <script>
+      function getStatusText(status) {
+        switch (status) {
+          case "completed":
+            return "مكتملة";
+          case "in_progress":
+            return "قيد التنفيذ";
+          case "not_started":
+          default:
+            return "لم تبدأ";
+        }
+      }
+
+      function translateUnit(unit) {
+        const map = {
+          piece: "قطعة",
+          meter: "متر",
+          kg: "كيلوجرام",
+          box: "علبة",
+          liter: "لتر",
+        };
+        return map[unit] || unit;
+      }
+
+      function translateFeatureKey(key) {
+        const map = {
+          electronicCard: "بطاقة إلكترونية",
+          battery: "بطارية طوارئ",
+          vvvf: "نظام VVVF",
+          warranty: "ضمان",
+          dismantleOldElevator: "فك المصعد القديم",
+        };
+        return map[key] || key;
+      }
+
+      const data = JSON.parse(localStorage.getItem("contractData"));
+
+      function renderSection(title, contentHtml, fullWidth = false) {
+        return `
+        <div class="section${fullWidth ? " full-width" : ""}">
+          <h2>${title}</h2>
+          ${contentHtml}
+        </div>
+      `;
+      }
+
+      function render() {
+        if (!data) {
+          document.getElementById("content").innerHTML =
+            "<p>لا توجد بيانات</p>";
+          return;
+        }
+
+        const specsNames = {
+          doorType: "نوع الباب",
+          doorSize: "حجم الباب (سم)",
+          innerDoor: "الباب الداخلي",
+          shaftWidth: "عرض البئر (سم)",
+          shaftLength: "طول البئر (سم)",
+          cabinSize: "حجم الكابينة",
+          shaftPit: "عمق البئر (سم)",
+          lastFloorHeight: "ارتفاع الدور الأخير (مم)",
+          totalShaftHeight: "الارتفاع الكلي للبئر (مم)",
+        };
+
+        const client = `
+        <p><strong>الاسم:</strong> ${data.client?.name || "-"}</p>
+        <p><strong>الهاتف:</strong> ${data.client?.phone || "-"}</p>
+        <p><strong>العنوان:</strong> ${data.client?.address || "-"}</p>
+      `;
+
+        const contract = `
+        <p><strong>رقم العقد:</strong> ${data.contract?.number || "-"}</p>
+        <p><strong>مدة التنفيذ:</strong> ${data.durationInDays || "-"} يوم</p>
+        <p><strong>حالة التنفيذ:</strong> ${getStatusText(data.executionStatus?.state)}</p>
+      `;
+
+        const pricing = `
+        <p><strong>السعر الأساسي:</strong> ${
+          data.pricing?.basePrice?.toLocaleString() || "-"
+        } ر.س</p>
+        <p><strong>سعر النظام:</strong> ${
+          data.pricing?.systemPrice?.toLocaleString() || "-"
+        } ر.س</p>
+        <p><strong>الضريبة:</strong> ${
+          data.pricing?.tax?.toLocaleString() || "-"
+        } ر.س</p>
+        <p><strong>الخصم:</strong> ${
+          data.pricing?.discount?.toLocaleString() || "-"
+        } ر.س</p>
+        <p><strong>السعر النهائي:</strong> <span class="highlight">${
+          data.pricing?.finalPrice?.toLocaleString() || "-"
+        } ر.س</span></p>
+      `;
+
+        const notes =
+          Object.values(data.notes || {})
+            .filter((n) => n && n.trim())
+            .map((n) => `<li>${n}</li>`)
+            .join("") || "<p>لا توجد ملاحظات</p>";
+
+        const specs = data.specifications
+          ? Object.entries(data.specifications)
+              .map(
+                ([key, value]) => `<li>${specsNames[key] || key}: ${value}</li>`
+              )
+              .join("")
+          : "-";
+
+        const features = data.elevator?.features;
+        let featuresHtml = "<p>لا توجد ميزات إضافية</p>";
+        if (features) {
+          featuresHtml = Object.entries(features)
+            .map(([key, val]) => {
+              return `<p>${translateFeatureKey(key)}: ${
+                val ? "✔️ نعم" : "❌ لا"
+              }</p>`;
+            })
+            .join("");
+        }
+
+        const additionalInfo = `
+        <p><strong>المندوب:</strong> ${data.representative || "-"}</p>
+        <p><strong>مكان النقل:</strong> ${data.transferLocation || "-"}</p>
+      `;
+
+        const mainContent = `
+          ${renderSection("معلومات العميل", client)}
+          ${renderSection("معلومات العقد", contract)}
+          ${renderSection("التسعير", pricing)}
+          ${renderSection("الملاحظات", `<ul>${notes}</ul>`)}
+          ${renderSection("مواصفات المصعد", `<ul>${specs}</ul>`)}
+          ${renderSection("الميزات الإضافية", featuresHtml)}
+        `;
+
+        let executionHtml = "<p>لا توجد مراحل تنفيذ</p>";
+        if (
+          data.executionStages &&
+          Object.keys(data.executionStages).length > 0
+        ) {
+          executionHtml = Object.entries(data.executionStages)
+            .map(
+              ([key, stage], idx) => `
+          <div>
+            <h4>المرحلة ${idx + 1} - ${stage.name || key}</h4>
+            <p><strong>الحالة:</strong> ${getStatusText(stage.status)}</p>
+            <p><strong>تاريخ البداية:</strong> ${new Date(stage.startDate).toLocaleDateString("ar-EG")}</p>
+            <p><strong>تاريخ النهاية:</strong> ${new Date(stage.endDate).toLocaleDateString("ar-EG")}</p>
+          </div>
+        `
+            )
+            .join("");
+        }
+
+        document.getElementById("content").innerHTML = 
+          mainContent +
+          renderSection("معلومات إضافية", additionalInfo, true) +
+          renderSection("مراحل التنفيذ", executionHtml, true);
+      }
+
+      render();
+
+      setTimeout(() => window.print(), 1000);
+    </script>
+  </body>
+</html>

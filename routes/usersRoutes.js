@@ -12,7 +12,7 @@ const {
 router.use(AuthUser, allowedTO("moderator"));
 
 // User Routes
-router.post("/", addUserValidator, addRecord);
+// router.post("/", addUserValidator, addRecord);
 router.put("/:id", updateUserValidator, updateRecord);
 
 module.exports = router;
